@@ -3,7 +3,7 @@ import goblinImg from "../../img/goblin.png";
 export default class MyContainer {
   constructor(element) {
     this._element = element;
-    this._lastSelectedItem = null;
+    this.lastIndex = null;
   }
 
   deleteRandomImage() {
@@ -17,22 +17,25 @@ export default class MyContainer {
   }
 
   getRandomImage() {
-    //Преобразуем HTMLCollection в настоящий массив (чтобы работали все методы массива)
-    const items = [...this._element.querySelectorAll(".container-item")];
+    //Получаем коллекцию div-ов
+    const items = this._element.querySelectorAll(".container-item");
 
-    //Формируем актуальный список div, в который можем закинуть картинку (используем метод массивов filter), при этом исключаем из выборки предыдущий div, где была картинка
-    let availableItems = items;
-    if (this._lastSelectedItem) {
-      availableItems = items.filter((item) => item !== this._lastSelectedItem);
+    //Проверка использования ранее индекса, если ранее он был уже записан, повторяем рандомное вычесления до тех пор, пока новый индекс не будет отличаться от ранее выбранного
+    let randomIndex;
+    if (items.length === 1) {
+      // Только один элемент — повтор неизбежен, просто используем его
+      randomIndex = 0;
+    } else {
+      // Гарантируем, что индекс отличается от предыдущего
+      do {
+        randomIndex = Math.floor(Math.random() * items.length);
+      } while (randomIndex === this.lastIndex);
     }
 
-    //Рандомно выбираем div из актуального списка
-    const randomIndex = Math.floor(Math.random() * availableItems.length);
+    const randomItem = items[randomIndex];
 
-    const randomItem = availableItems[randomIndex];
-
-    //Перезаписываем предыдущий div, чтобы картинка повторно туда не могла попасть
-    this._lastSelectedItem = randomItem;
+    //Перезаписываем предыдущий индекс, чтобы картинка повторно туда не могла попасть
+    this.lastIndex = randomIndex;
 
     //Создаем HTML элемент img, указывая путь на картинку и class
     const imgElement = document.createElement("img");
@@ -40,6 +43,6 @@ export default class MyContainer {
     imgElement.classList.add("img");
 
     //Помещаем картинку в рандомный div из актуального списка
-    randomItem.appendChild(imgElement);
+    randomItem.append(imgElement);
   }
 }

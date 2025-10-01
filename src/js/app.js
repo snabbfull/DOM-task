@@ -1,15 +1,35 @@
 import MyContainer from "./container/container.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const container = new MyContainer(document.querySelector(".container"));
+  const game = document.querySelector("body");
+  let finishGame = document.createElement("button");
+  finishGame.textContent = "Завершить игру";
+  finishGame.classList.add("finish");
 
-  window.container = container;
+  game.append(finishGame);
+
+  const container = document.querySelector(".container");
+
+  for (let i = 0; i < 16; i++) {
+    const containerItem = document.createElement("div");
+    containerItem.classList.add("container-item");
+    containerItem.dataset.id = i;
+
+    container.append(containerItem);
+  }
+
+  const myContainer = new MyContainer(container);
+
+  window.container = myContainer;
 
   const randomImgInterval = setInterval(() => {
-    const image = document.querySelector(".img");
-    if (image) {
-      container.deleteRandomImage();
-    }
-    container.getRandomImage();
+    myContainer.deleteRandomImage();
+    myContainer.getRandomImage();
   }, 1000);
+
+  window.randomImgInterval = randomImgInterval;
+
+  finishGame = document.addEventListener("click", () => {
+    clearInterval(window.randomImgInterval);
+  });
 });
